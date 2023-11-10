@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".HistoryActivity">
+
+    <LinearLayout
+        android:id="@+id/LayoutHeader"
+        style="@style/LinearLayoutHeader"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/backArrow"
+            android:layout_marginStart="20dp"
+            style="@style/ImageViewBackArrow"/>
+
+        <TextView
+            android:id="@+id/Header"
+            android:paddingEnd="50dp"
+            android:text="@string/historyHeader"
+            style="@style/TextViewHeaderStyle"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/ListViewHistory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/LayoutHeader"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

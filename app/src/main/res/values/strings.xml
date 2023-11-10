@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">Crocodile</string>
+    <string name="tvNameGame">Crocodile</string>
+
+    <string name="butNewGame">New Game</string>
+    <string name="butContinue">Continue</string>
+    <string name="butHistory">History</string>
+
+    <string name="butNewWord">New word</string>
+    <string name="butRules">Rules</string>
+    <string name="hardMode">hard mode</string>
+    <string name="easyMode">easy mode</string>
+    <string name="startWords">Click on \"New word\"</string>
+
+    <string name="dialogRules">         Rules of the game \"Crocodile\" \n
+
+        The first Crocodile player who clicks gets a word that he has to explain with gestures, without using words or sounds. The
+rest of the participants must understand which word shows, they can offer their options, and the Crocodile gestures to show whether the other players are thinking in the right direction. \n
+
+        The first one who guessed the word gets the right to be a Crocodile, he gets a new word, which he must explain without words. \n
+
+        If the word is too difficult to explain, then you can skip it and choose the appropriate one from the suggested ones.
+
+        The word you like can be found in the word history if you accidentally missed it. \n
+If the words from the basic mode seem too simple for you to explain, then you can change the mode to "Complex" \n
+
+        Have a good game!</string>
+    <string name="butDialogRules">OK</string>
+
+    <string name="historyHeader">word\'s history</string>
+</resources>

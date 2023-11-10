@@ -1,0 +1,11 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Test_empty_app" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- dark theme here. -->
+        <item name="android:statusBarColor">@color/background_green_dark</item>
+        <item name="colorPrimary">@color/deep_green</item>
+        <item name="colorSecondary">@color/strong_green_dark</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="colorSurface">@color/background_green_dark</item>
+    </style>
+</resources>
