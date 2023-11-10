@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Крокодил</string>
-    <string name="tvNameGame">Крокодил</string>
 
     <string name="butNewGame">Новая игра</string>
     <string name="butContinue">Продолжить</string>
@@ -31,4 +29,6 @@
     <string name="butDialogRules">Понятно</string>
 
     <string name="historyHeader">история слов</string>
+    <string name="app_name">Крокодил</string>
+    <string name="tvNameGame">Крокодил</string>
 </resources>

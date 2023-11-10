@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">Crocodile</string>
-    <string name="tvNameGame">Crocodile</string>
+    <string name="app_name">CrocoMust</string>
+    <string name="tvNameGame">CrocoMust</string>
 
     <string name="butNewGame">New Game</string>
     <string name="butContinue">Continue</string>
