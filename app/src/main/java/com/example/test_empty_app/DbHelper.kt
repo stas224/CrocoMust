@@ -11,21 +11,20 @@ import java.io.IOException
 class DbHelper(private val context: Context) :
     SQLiteOpenHelper(context, "userWords", null, 1) {
 
-    override fun onCreate(db: SQLiteDatabase) {
+    override fun onCreate(db: SQLiteDatabase?) {
         val queryFirst =
             "CREATE TABLE IF NOT EXISTS userWords (id INT PRIMARY KEY, word VARCHAR(100), mode INT, idFirst INT)"
-        db.execSQL(queryFirst)
-
+        db?.execSQL(queryFirst)
         val querySecond =
             "CREATE TABLE IF NOT EXISTS words (id INT PRIMARY KEY, wordRu VARCHAR(100), wordEng VARCHAR(100), mode INT)"
-        db.execSQL(querySecond)
+        db?.execSQL(querySecond)
     }
 
-    override fun onUpgrade(db: SQLiteDatabase, p1: Int, p2: Int) {
+    override fun onUpgrade(db: SQLiteDatabase?, p1: Int, p2: Int) {
         val query = "DROP TABLE IF EXISTS userWords"
-        db.execSQL(query)
+        db?.execSQL(query)
         val query2 = "DROP TABLE IF EXISTS words"
-        db.execSQL(query2)
+        db?.execSQL(query2)
         onCreate(db)
     }
 
@@ -51,21 +50,22 @@ class DbHelper(private val context: Context) :
     @SuppressLint("Range")
     private fun moveDB(){
         val externalDb = SQLiteDatabase.openDatabase(context.filesDir.path + "db.db", null, SQLiteDatabase.OPEN_READONLY)
-        val query2 = "SELECT * FROM words"
-        val cursor = externalDb.rawQuery(query2, null)
-        if (cursor.moveToFirst()) {
-            do {
-                val id = cursor.getInt(cursor.getColumnIndex("_id"))
-                val wordRu = cursor.getString(cursor.getColumnIndex("word_ru"))
-                val wordEng = cursor.getString(cursor.getColumnIndex("word_eng"))
-                val mode = cursor.getInt(cursor.getColumnIndex("mode"))
+        val query = "SELECT * FROM words"
+        val cursor = externalDb.rawQuery(query , null)
+        cursor.use{
+            if (it.moveToFirst()) {
+                do {
+                    val id = it.getInt(it.getColumnIndex("_id"))
+                    val wordRu = it.getString(it.getColumnIndex("word_ru"))
+                    val wordEng = it.getString(it.getColumnIndex("word_eng"))
+                    val mode = it.getInt(it.getColumnIndex("mode"))
 
-                val wordDb = WordDb(id, wordRu, wordEng, mode)
-                addWordDb(wordDb)
+                    val wordDb = WordDb(id, wordRu, wordEng, mode)
+                    addWordDb(wordDb)
 
-            } while (cursor.moveToNext())
+                } while (it.moveToNext())
+            }
         }
-        cursor.close()
         externalDb.close()
     }
 
@@ -77,12 +77,12 @@ class DbHelper(private val context: Context) :
         var word = ""
         var id = 0
 
-        if (cursor.moveToFirst()) {
-            word = cursor.getString(cursor.getColumnIndex(curLang))
-            id = cursor.getInt(cursor.getColumnIndex("id"))
+        cursor.use {
+            if (it.moveToFirst()) {
+                word = it.getString(it.getColumnIndex(curLang))
+                id = it.getInt(it.getColumnIndex("id"))
+            }
         }
-
-        cursor.close()
         db.close()
 
         return Pair(word, id)
@@ -96,10 +96,7 @@ class DbHelper(private val context: Context) :
         }
 
         val db = this.writableDatabase
-        with(db) {
-            insert("userWords", null, values)
-            close()
-        }
+        db.use { it.insert("userWords", null, values) }
     }
 
     private fun addWordDb(word: WordDb) {
@@ -111,36 +108,32 @@ class DbHelper(private val context: Context) :
         }
 
         val db = this.writableDatabase
-        with(db) {
-            insert("words", null, values)
-            close()
-        }
+        db.use { it.insert("words", null, values) }
     }
 
     @SuppressLint("Range")
     fun getHistory(): MutableList<String> {
-        val db = this.readableDatabase
-        val query = "SELECT * FROM userWords"
-        val cursor = db.rawQuery(query, null)
         val history = mutableListOf<String>()
-        if (cursor.moveToFirst()) {
-            do {
-                val word = cursor.getString(cursor.getColumnIndex("word"))
-                history.add(word)
+        val db = this.readableDatabase
+        val query = "SELECT * FROM userWords ORDER BY id DESC"
+        val cursor = db.rawQuery(query, null)
 
-            } while (cursor.moveToNext())
+        cursor.use {
+            if (it.moveToFirst()) {
+                do {
+                    val word = it.getString(it.getColumnIndex("word"))
+                    history.add(word)
+                } while (it.moveToNext())
+            }
         }
-        cursor.close()
+        db.close()
+
         return history
     }
 
     fun cleanHistory(){
         val db = this.writableDatabase
         val query = "DELETE from userWords"
-        with(db){
-            execSQL(query)
-            close()
-        }
+        db.use{ it.execSQL(query) }
     }
-
 }
