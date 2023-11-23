@@ -15,6 +15,7 @@ class GameActivity : AppCompatActivity() {
     private var wordValue: String? = null
     private var mode: Int = 1
     private var click: Boolean = false
+    private var checkNewGame : Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,50 +28,52 @@ class GameActivity : AppCompatActivity() {
         val buttonRules: Button = findViewById(R.id.buttonRules)
         val backArrow: ImageView = findViewById(R.id.backArrow)
 
-        val db = DbHelper(this, null)
-
+        val db = DbHelper(this)
+        
         savedInstanceState?.also {
-            wordValue = it.getString("Key")
-            mode = it.getInt("Mode")
             click = it.getBoolean("Click")
+            checkNewGame = it.getBoolean("checkNewGame")
         }
 
-        if (wordValue != null) card.text = wordValue
-        else{
-            with(db.getLastWord()) {
-                if (first != "") {
-                    card.text = first
-                    mode = second
-                }
+        val extras = intent.getBooleanExtra("New game", false)
+        if (checkNewGame || !extras) {
+            val sharePref = getSharedPreferences("myPref", MODE_PRIVATE)
+            sharePref.also {
+                wordValue = it.getString("Word", getString(R.string.startWords))
+                mode = it.getInt("Mode", 1)
             }
+
+            card.text = wordValue
+            if (mode == 2) buttonMode.text = getString(R.string.hardMode)
+            intent.putExtra("New game", false)
         }
-
-        if (mode == 2) buttonMode.text = getString(R.string.hardMode)
-
+        checkNewGame = true
         backArrow.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
 
+
         buttonNewWord.setOnClickListener {
             val curLang =  if(resources.configuration.locales[0].language == "ru") "wordRu" else "wordEng"
-            var pairWordMode = db.getWord(curLang, mode)
-            wordValue = pairWordMode.first
+            var pairWordId = db.getWord(curLang, mode)
 
-            if (wordValue == "") {
+            if (pairWordId.first == "") {
                 db.copyDatabase()
-                pairWordMode = db.getWord(curLang, mode)
-                wordValue = pairWordMode.first
+                pairWordId = db.getWord(curLang, mode)
                 }
 
-            val word = Word(wordValue!!, mode, pairWordMode.second)
+            val word = Word(pairWordId.first, mode, pairWordId.second)
             db.addWord(word)
+
+            wordValue = pairWordId.first
             card.text = wordValue
         }
 
         buttonMode.setOnClickListener {
             val modeEasy = getString(R.string.easyMode)
             val modeHard = getString(R.string.hardMode)
+
             buttonMode.text = if (buttonMode.text == modeEasy) {
                 mode = 2
                 modeHard
@@ -99,27 +102,20 @@ class GameActivity : AppCompatActivity() {
             }
         }
 
-        if (click){
-            buttonRules.performClick()
-        }
+        if (click) buttonRules.performClick()
     }
-
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString("Word", wordValue)
-        outState.putInt("Mode", mode)
         outState.putBoolean("Click", click)
-    }
+        outState.putBoolean("checkNewGame", checkNewGame)
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        wordValue = savedInstanceState.getString("Word")
-        mode = savedInstanceState.getInt("Mode")
-        click = savedInstanceState.getBoolean("Click")
+        val sharePref = getSharedPreferences("myPref", MODE_PRIVATE)
+        with(sharePref.edit()){
+            putString("Word", wordValue)
+            putInt("Mode", mode)
+            apply()
+        }
     }
-
 
 }
-
-

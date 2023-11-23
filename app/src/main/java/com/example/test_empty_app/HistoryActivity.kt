@@ -15,7 +15,7 @@ class HistoryActivity : AppCompatActivity() {
         val backArrow: ImageView = findViewById(R.id.backArrow)
         val listViewHistory: ListView = findViewById(R.id.ListViewHistory)
 
-        val db = DbHelper(this, null)
+        val db = DbHelper(this)
         val words = mutableListOf<String>()
         val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, words)
         listViewHistory.adapter = adapter

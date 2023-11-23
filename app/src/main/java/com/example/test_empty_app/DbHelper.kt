@@ -8,26 +8,24 @@ import android.database.sqlite.SQLiteOpenHelper
 import java.io.FileOutputStream
 import java.io.IOException
 
-class DbHelper(private val context: Context, factory: SQLiteDatabase.CursorFactory?) :
-    SQLiteOpenHelper(context, "userWords", factory, 1) {
+class DbHelper(private val context: Context) :
+    SQLiteOpenHelper(context, "userWords", null, 1) {
 
-    @SuppressLint("Range")
-    override fun onCreate(db: SQLiteDatabase?) {
+    override fun onCreate(db: SQLiteDatabase) {
         val queryFirst =
             "CREATE TABLE IF NOT EXISTS userWords (id INT PRIMARY KEY, word VARCHAR(100), mode INT, idFirst INT)"
-        db?.execSQL(queryFirst)
+        db.execSQL(queryFirst)
 
         val querySecond =
             "CREATE TABLE IF NOT EXISTS words (id INT PRIMARY KEY, wordRu VARCHAR(100), wordEng VARCHAR(100), mode INT)"
-        db?.execSQL(querySecond)
-
+        db.execSQL(querySecond)
     }
 
-    override fun onUpgrade(db: SQLiteDatabase?, p1: Int, p2: Int) {
+    override fun onUpgrade(db: SQLiteDatabase, p1: Int, p2: Int) {
         val query = "DROP TABLE IF EXISTS userWords"
-        db?.execSQL(query)
+        db.execSQL(query)
         val query2 = "DROP TABLE IF EXISTS words"
-        db?.execSQL(query2)
+        db.execSQL(query2)
         onCreate(db)
     }
 
@@ -51,7 +49,7 @@ class DbHelper(private val context: Context, factory: SQLiteDatabase.CursorFacto
     }
 
     @SuppressLint("Range")
-    fun moveDB(){
+    private fun moveDB(){
         val externalDb = SQLiteDatabase.openDatabase(context.filesDir.path + "db.db", null, SQLiteDatabase.OPEN_READONLY)
         val query2 = "SELECT * FROM words"
         val cursor = externalDb.rawQuery(query2, null)
@@ -71,7 +69,7 @@ class DbHelper(private val context: Context, factory: SQLiteDatabase.CursorFacto
         externalDb.close()
     }
 
-    @SuppressLint("Range", "Recycle")
+    @SuppressLint("Range")
     fun getWord(curLang: String, mode: Int): Pair<String, Int> {
         val db = this.readableDatabase
         val query = "SELECT $curLang, id FROM words WHERE id NOT IN (SELECT idFirst FROM userWords) AND mode=$mode ORDER BY RANDOM()"
@@ -91,10 +89,11 @@ class DbHelper(private val context: Context, factory: SQLiteDatabase.CursorFacto
     }
 
     fun addWord(word: Word) {
-        val values = ContentValues()
-        values.put("word", word.value)
-        values.put("mode", word.mode)
-        values.put("idFirst", word.idFirst)
+        val values = ContentValues().apply {
+            put("word", word.value)
+            put("mode", word.mode)
+            put("idFirst", word.idFirst)
+        }
 
         val db = this.writableDatabase
         with(db) {
@@ -104,11 +103,12 @@ class DbHelper(private val context: Context, factory: SQLiteDatabase.CursorFacto
     }
 
     private fun addWordDb(word: WordDb) {
-        val values = ContentValues()
-        values.put("id", word.id)
-        values.put("wordRu", word.wordRu)
-        values.put("wordEng", word.wordEng)
-        values.put("mode", word.mode)
+        val values = ContentValues().apply {
+            put("id", word.id)
+            put("wordRu", word.wordRu)
+            put("wordEng", word.wordEng)
+            put("mode", word.mode)
+        }
 
         val db = this.writableDatabase
         with(db) {
@@ -117,13 +117,7 @@ class DbHelper(private val context: Context, factory: SQLiteDatabase.CursorFacto
         }
     }
 
-    fun cleanHistory(){
-        val db = this.writableDatabase
-        val query = "DELETE from userWords"
-        db?.execSQL(query)
-    }
-
-    @SuppressLint("Range","Recycle")
+    @SuppressLint("Range")
     fun getHistory(): MutableList<String> {
         val db = this.readableDatabase
         val query = "SELECT * FROM userWords"
@@ -136,26 +130,17 @@ class DbHelper(private val context: Context, factory: SQLiteDatabase.CursorFacto
 
             } while (cursor.moveToNext())
         }
+        cursor.close()
         return history
-
     }
 
-    @SuppressLint("Range", "Recycle")
-    fun getLastWord(): Pair<String, Int>{
-        val db = this.readableDatabase
-        val query = "SELECT word, mode FROM userWords ORDER BY id DESC LIMIT 1"
-        val cursor = db.rawQuery(query, null)
-        var lastWord = ""
-        var lastMode = 1
-
-        if (cursor.moveToFirst()){
-            lastWord = cursor.getString(cursor.getColumnIndex("word"))
-            lastMode = cursor.getInt(cursor.getColumnIndex("mode"))
+    fun cleanHistory(){
+        val db = this.writableDatabase
+        val query = "DELETE from userWords"
+        with(db){
+            execSQL(query)
+            close()
         }
-
-        return Pair(lastWord, lastMode)
     }
 
 }
-
-
