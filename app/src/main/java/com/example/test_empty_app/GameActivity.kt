@@ -45,14 +45,14 @@ class GameActivity : AppCompatActivity() {
 
             card.text = wordValue
             if (mode == 2) buttonMode.text = getString(R.string.hardMode)
-            intent.putExtra("New game", false)
+
         }
         checkNewGame = true
+
         backArrow.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
-
 
         buttonNewWord.setOnClickListener {
             val curLang =  if(resources.configuration.locales[0].language == "ru") "wordRu" else "wordEng"
@@ -117,5 +117,4 @@ class GameActivity : AppCompatActivity() {
             apply()
         }
     }
-
 }
