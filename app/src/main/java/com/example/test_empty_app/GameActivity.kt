@@ -17,6 +17,7 @@ class GameActivity : AppCompatActivity() {
     private var click: Boolean = false
     private var checkNewGame : Boolean = false
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -105,10 +106,8 @@ class GameActivity : AppCompatActivity() {
         if (click) buttonRules.performClick()
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putBoolean("Click", click)
-        outState.putBoolean("checkNewGame", checkNewGame)
+    override fun onPause() {
+        super.onPause()
 
         val sharePref = getSharedPreferences("myPref", MODE_PRIVATE)
         with(sharePref.edit()){
@@ -116,5 +115,13 @@ class GameActivity : AppCompatActivity() {
             putInt("Mode", mode)
             apply()
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putBoolean("Click", click)
+        outState.putBoolean("checkNewGame", checkNewGame)
+
     }
 }
